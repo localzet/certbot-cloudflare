@@ -1,1 +1,3 @@
+# /etc/crontabs/root
+
 0 0 * * * /renew.sh >> /var/log/cron.log 2>&1
