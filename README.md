@@ -25,7 +25,7 @@ services:
       CF_EMAIL: your_cloudflare_email@example.com
       CF_API_KEY: your_cloudflare_api_key_here
       CERTBOT_EMAIL: admin@yourdomain.com
-      CERTBOT_DOMAINS: zorin.space *.zorin.space localzet.ru *.localzet.ru
+      CERTBOT_DOMAINS: yourdomain.com *.yourdomain.com
     volumes:
       - ./certs:/etc/letsencrypt
     restart: unless-stopped
