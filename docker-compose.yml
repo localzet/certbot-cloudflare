@@ -1,12 +1,13 @@
 services:
   certbot:
-    build: ./certbot-cloudflare
+    build:
+      context: .
     container_name: certbot-cloudflare
     environment:
-      CF_EMAIL: your_cloudflare_email@example.com
-      CF_API_KEY: your_cloudflare_api_key_here
-      CERTBOT_EMAIL: admin@yourdomain.com
-      CERTBOT_DOMAINS: yourdomain.com *.yourdomain.com
+      CERTBOT_EMAIL: "${CERTBOT_EMAIL:?Set CERTBOT_EMAIL}"
+      CERTBOT_DOMAINS: "${CERTBOT_DOMAINS:?Set CERTBOT_DOMAINS}"
+      CERTBOT_CERT_NAME: "${CERTBOT_CERT_NAME:-default-cert}"
+      CF_DNS_API_TOKEN: "${CF_DNS_API_TOKEN:?Set a scoped Cloudflare DNS API token}"
     volumes:
       - ./certs:/etc/letsencrypt
     restart: unless-stopped
