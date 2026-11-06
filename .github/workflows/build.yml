@@ -6,6 +6,19 @@ on:
       - main
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate renewal script before publishing images
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck
+          shellcheck renew.sh
+          sh tests/renewal.sh
+
   send-start-message:
     name: 📢 Send Telegram message
     runs-on: ubuntu-latest
@@ -62,6 +75,7 @@ jobs:
             ❌ Ошибка в ${{ github.REPOSITORY }}: проблемы в сборке
 
   build:
+    needs: [verify]
     runs-on: ubuntu-latest
     permissions:
       contents: read
