@@ -12,7 +12,7 @@ jobs:
   shell:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Shellcheck
         run: |
           sudo apt-get update -qq
@@ -24,6 +24,6 @@ jobs:
   image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Docker build (no push)
         run: docker build -t certbot-cloudflare:test .
