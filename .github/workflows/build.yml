@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Validate renewal script before publishing images
         run: |
           sudo apt-get update -qq
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🔧 Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
         uses: appleboy/telegram-action@master
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🔧 Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
         uses: appleboy/telegram-action@master
@@ -64,7 +64,7 @@ jobs:
     if: failure()
     steps:
       - name: 🔧 Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
         uses: appleboy/telegram-action@master
@@ -83,7 +83,7 @@ jobs:
       id-token: write
     steps:
       - name: 🔧 Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 🔧 Set up QEMU
         uses: docker/setup-qemu-action@v3
