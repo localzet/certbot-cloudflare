@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v1.1.1
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v1.1.1
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v1.1.1
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
