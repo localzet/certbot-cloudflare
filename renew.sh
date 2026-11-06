@@ -37,6 +37,7 @@ fi
 # Split the documented space-delimited list without pathname expansion.
 set -f
 set --
+# shellcheck disable=SC2086 # Deliberate field splitting of space-delimited domains.
 for domain in $CERTBOT_DOMAINS; do
     set -- "$@" -d "$domain"
 done
