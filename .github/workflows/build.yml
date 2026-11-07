@@ -6,15 +6,28 @@ on:
       - main
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate renewal script before publishing images
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck
+          shellcheck renew.sh
+          sh tests/renewal.sh
+
   send-start-message:
     name: 📢 Send Telegram message
     runs-on: ubuntu-latest
     steps:
       - name: 🔧 Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v1.1.1
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
@@ -30,10 +43,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🔧 Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v1.1.1
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
@@ -51,10 +64,10 @@ jobs:
     if: failure()
     steps:
       - name: 🔧 Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 📬 Send Telegram message
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v1.1.1
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
@@ -62,6 +75,7 @@ jobs:
             ❌ Ошибка в ${{ github.REPOSITORY }}: проблемы в сборке
 
   build:
+    needs: [verify]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -69,7 +83,7 @@ jobs:
       id-token: write
     steps:
       - name: 🔧 Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 🔧 Set up QEMU
         uses: docker/setup-qemu-action@v3

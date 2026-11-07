@@ -1,55 +1,33 @@
 # Certbot Cloudflare
 
-Контейнер для автоматического получения и обновления SSL-сертификатов через Let's Encrypt и Cloudflare DNS.
+Automated Let's Encrypt DNS-01 certificate issuance/renewal with the official `certbot/dns-cloudflare` plugin. Use a **scoped Cloudflare API token** with `Zone:DNS:Edit` permissions for the relevant zone. Do not use a Cloudflare Global API Key.
 
-## 🔧 Переменные окружения
+## Setup
 
-| Переменная          | Описание                                                   |
-|---------------------|------------------------------------------------------------|
-| `CF_EMAIL`          | Email от аккаунта Cloudflare                               |
-| `CF_API_KEY`        | API ключ Cloudflare                                        |
-| `CERTBOT_EMAIL`     | Email для уведомлений Let’s Encrypt                        |
-| `CERTBOT_DOMAINS`   | Список доменов через пробел (включая поддомены)            |
-| `CERTBOT_CERT_NAME` | Имя сертификата (опционально, по умолчанию `default-cert`) |
-
-## 📦 Использование с Docker Compose
-
-```yaml
-version: '3'
-
-services:
-  certbot:
-    image: ghcr.io/localzet/certbot-cloudflare:latest
-    container_name: certbot-cloudflare
-    environment:
-      CF_EMAIL: your_cloudflare_email@example.com
-      CF_API_KEY: your_cloudflare_api_key_here
-      CERTBOT_EMAIL: admin@yourdomain.com
-      CERTBOT_DOMAINS: yourdomain.com *.yourdomain.com
-    volumes:
-      - ./certs:/etc/letsencrypt
-    restart: unless-stopped
-
-  yourapp:
-    image: your-app
-    ports:
-      - "443:443"
-    volumes:
-      - ./certs/live/default-cert:/ssl
-    environment:
-      SSL_CERT_PATH: "/ssl/fullchain.pem"
-      SSL_KEY_PATH: "/ssl/privkey.pem"
-    depends_on:
-      - certbot
-    restart: unless-stopped
+```sh
+cp .env.example .env
+# Fill in a scoped API token; .env is ignored by Git.
+chmod 600 .env
+docker compose config --quiet
+docker compose up -d --build
+docker compose exec certbot /renew.sh
 ```
 
-## ✅ Где взять Cloudflare API ключ?
+Environment variables:
+- `CF_DNS_API_TOKEN`: scoped Cloudflare API token.
+- `CERTBOT_EMAIL`: Let's Encrypt account email.
+- `CERTBOT_DOMAINS`: **space-separated**, e.g. `example.com *.example.com`; quote in shell/.env as needed.
+- `CERTBOT_CERT_NAME`: optional lineage name, default `default-cert`.
+- `CLOUDFLARE_CREDENTIALS_FILE`: optional path to a pre-mounted credentials INI instead of passing a token in environment (set when running `/renew.sh` manually).
 
-[https://dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens)
-Создайте API Token с правами:
+The script creates a temporary credentials file with restrictive permissions, removes it when finished and propagates Certbot failures. The container cron invokes the script every day; `--keep-until-expiring` prevents unnecessary certificate replacements. Certbot does **not** automatically reload the web server using these certificates: configure a trusted deploy hook or a reload mechanism on the consumer.
 
-- Zone: DNS — Edit
-- Email: Read
+### Dry-run without altering issued certificates
 
-Или используйте Global API Key.
+For an initial issuance check, construct the credentials file separately and run:
+
+```sh
+docker compose exec certbot sh -c 'certbot certonly --dns-cloudflare --dns-cloudflare-credentials /path/to/credentials.ini --dry-run -d example.com'
+```
+
+Do not store credentials in the repository. Avoid printing the interpolated Compose config or credentials in CI/logs. The checked-in `docker-compose.yml` expects environment variables from an ignored `.env` file.
